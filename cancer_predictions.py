@@ -14,9 +14,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 y_train = y_train.reshape(-1, 1)
 
-dense1 = Layer_Dense(X.shape[1], 10)
+dense1 = Layer_Dense(X.shape[1], 16)
 activation1 = Activation_ReLU()
-dense2 = Layer_Dense(10, 1)
+dense2 = Layer_Dense(16, 1)
 activation2 = Activation_Sigmoid()
 loss_function = Loss_BinaryCrossentropy()
 optimizer = Optimizer_Adam(decay=5e-7)
@@ -53,7 +53,11 @@ for epoch in range(10001):
     predictions = (activation2.output > 0.5) * 1
     accuracy = np.mean(predictions==y_train)
 
-
+    if not epoch % 100:
+            print(f'epoch: {epoch}, ' +
+                f'acc: {accuracy:.3f}, ' +
+                f'loss: {loss:.3f}, ' +
+                f'lr: {optimizer.current_learning_rate}')
 
     # Backward pass
     loss_function.backward(activation2.output, y_train)
@@ -69,33 +73,31 @@ for epoch in range(10001):
     optimizer.post_update_params()
 
 
-
 y_test = y_test.reshape(-1, 1)
 
-print(y_test)
-# Perform a forward pass of our testing data through this layer
 dense1.forward(X_test)
 
-# Perform a forward pass through activation function
-# takes the output of first dense layer here
 activation1.forward(dense1.output)
 
-# Perform a forward pass through second Dense layer
-# takes outputs of activation function of first layer as inputs
 dense2.forward(activation1.output)
 
-# Perform a forward pass through activation function
-# takes the output of second dense layer here
 activation2.forward(dense2.output)
-print(y_test -activation2.output)
-# Calculate the data loss
+
 loss = loss_function.calculate(activation2.output, y_test)
 
-# Calculate accuracy from output of activation2 and targets
-# Part in the brackets returns a binary mask - array consisting of
-# True/False values, multiplying it by 1 changes it into array
-# of 1s and 0s
+MSE = np.square(np.subtract(y_test,activation2.output)).mean()
 predictions = (activation2.output > 0.5) * 1
 accuracy = np.mean(predictions==y_test)
 
-print(f'validation, acc: {accuracy:.3f}, loss: {loss:.3f}')
+print(f'validation, acc: {accuracy:.3f}, loss: {loss:.3f}, MSE: {MSE:.3f}')
+
+"""
+np.set_printoptions(suppress=True)
+np.set_printoptions(precision=10)
+for x in range(6):
+    print(f'Test: {x}')
+    print("Actual output:")
+    print(y_test[x])
+    print("Predicted output:")
+    print(activation2.output[x])
+"""
