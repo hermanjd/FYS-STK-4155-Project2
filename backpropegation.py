@@ -1,6 +1,6 @@
 import numpy as np
 import nnfs
-from nnfs.datasets import spiral_data
+from nnfs.datasets import sine_data
 
 nnfs.init()
 
@@ -13,7 +13,7 @@ class Layer_Dense:
                  weight_regularizer_l1=0, weight_regularizer_l2=0,
                  bias_regularizer_l1=0, bias_regularizer_l2=0):
         # Initialize weights and biases
-        self.weights = 0.01 * np.random.randn(n_inputs, n_neurons)
+        self.weights = 0.1 * np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
         # Set regularization strength
         self.weight_regularizer_l1 = weight_regularizer_l1
@@ -82,7 +82,6 @@ class Layer_Dropout:
     def backward(self, dvalues):
         # Gradient on values
         self.dinputs = dvalues * self.binary_mask
-
 
 # ReLU activation
 class Activation_ReLU:
@@ -158,6 +157,21 @@ class Activation_Sigmoid:
         self.dinputs = dvalues * (1 - self.output) * self.output
 
 
+# Linear activation
+class Activation_Linear:
+
+    # Forward pass
+    def forward(self, inputs):
+        # Just remember values
+        self.inputs = inputs
+        self.output = inputs
+
+    # Backward pass
+    def backward(self, dvalues):
+        # derivative is 1, 1 * dvalues = dvalues - the chain rule
+        self.dinputs = dvalues.copy()
+
+
 # SGD optimizer
 class Optimizer_SGD:
 
@@ -175,7 +189,6 @@ class Optimizer_SGD:
         if self.decay:
             self.current_learning_rate = self.learning_rate * \
                 (1. / (1. + self.decay * self.iterations))
-
 
     # Update parameters
     def update_params(self, layer):
@@ -216,11 +229,9 @@ class Optimizer_SGD:
         # vanilla or momentum updates
         layer.weights += weight_updates
         layer.biases += bias_updates
-
     # Call once after any parameter updates
     def post_update_params(self):
         self.iterations += 1
-
 
 
 # Adagrad optimizer
@@ -265,8 +276,6 @@ class Optimizer_Adagrad:
     # Call once after any parameter updates
     def post_update_params(self):
         self.iterations += 1
-
-
 
 # RMSprop optimizer
 class Optimizer_RMSprop:
@@ -314,7 +323,6 @@ class Optimizer_RMSprop:
     # Call once after any parameter updates
     def post_update_params(self):
         self.iterations += 1
-
 
 
 # Adam optimizer
@@ -407,8 +415,9 @@ class Loss:
         # L2 regularization - weights
         if layer.weight_regularizer_l2 > 0:
             regularization_loss += layer.weight_regularizer_l2 * \
-                                   np.sum(layer.weights *
+                                   np.sum(layer.weights * \
                                           layer.weights)
+
 
         # L1 regularization - biases
         # calculate only when factor greater than 0
@@ -419,7 +428,7 @@ class Loss:
         # L2 regularization - biases
         if layer.bias_regularizer_l2 > 0:
             regularization_loss += layer.bias_regularizer_l2 * \
-                                   np.sum(layer.biases *
+                                   np.sum(layer.biases * \
                                           layer.biases)
 
         return regularization_loss
@@ -458,13 +467,13 @@ class Loss_CategoricalCrossentropy(Loss):
                 range(samples),
                 y_true
             ]
-
         # Mask values - only for one-hot encoded labels
         elif len(y_true.shape) == 2:
             correct_confidences = np.sum(
                 y_pred_clipped * y_true,
                 axis=1
             )
+
         # Losses
         negative_log_likelihoods = -np.log(correct_confidences)
         return negative_log_likelihoods
@@ -511,7 +520,6 @@ class Activation_Softmax_Loss_CategoricalCrossentropy():
 
         # Number of samples
         samples = len(dvalues)
-
 
         # If labels are one-hot encoded,
         # turn them into discrete values
@@ -560,5 +568,60 @@ class Loss_BinaryCrossentropy(Loss):
         # Calculate gradient
         self.dinputs = -(y_true / clipped_dvalues -
                          (1 - y_true) / (1 - clipped_dvalues)) / outputs
+        # Normalize gradient
+        self.dinputs = self.dinputs / samples
+
+
+# Mean Squared Error loss
+class Loss_MeanSquaredError(Loss):  # L2 loss
+
+    # Forward pass
+    def forward(self, y_pred, y_true):
+
+        # Calculate loss
+        sample_losses = np.mean((y_true - y_pred)**2, axis=-1)
+
+        # Return losses
+        return sample_losses
+
+    # Backward pass
+    def backward(self, dvalues, y_true):
+
+        # Number of samples
+        samples = len(dvalues)
+        # Number of outputs in every sample
+        # We'll use the first sample to count them
+        outputs = len(dvalues[0])
+
+        # Gradient on values
+        self.dinputs = -2 * (y_true - dvalues) / outputs
+        # Normalize gradient
+        self.dinputs = self.dinputs / samples
+
+
+# Mean Absolute Error loss
+class Loss_MeanAbsoluteError(Loss):  # L1 loss
+
+    # Forward pass
+    def forward(self, y_pred, y_true):
+
+        # Calculate loss
+        sample_losses = np.mean(np.abs(y_true - y_pred), axis=-1)
+
+        # Return losses
+        return sample_losses
+
+
+    # Backward pass
+    def backward(self, dvalues, y_true):
+
+        # Number of samples
+        samples = len(dvalues)
+        # Number of outputs in every sample
+        # We'll use the first sample to count them
+        outputs = len(dvalues[0])
+
+        # Calculate gradient
+        self.dinputs = np.sign(y_true - dvalues) / outputs
         # Normalize gradient
         self.dinputs = self.dinputs / samples
