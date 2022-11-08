@@ -1,20 +1,19 @@
+from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
 from backpropegation import *
 import matplotlib.pyplot as plt
+import StatFunctions
 
-datapoints = 200
+datapoints = 100
 
 def f(x):
     return 4.2 + 3.2*x - 0.6*x**2
 
 x = (np.random.rand(datapoints)*10).reshape(-1, 1)
-print(x)
 y = (f(x)).reshape(-1, 1)
 
-
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-print(X_test)
 
 dense1 = Layer_Dense(1, 64)
 activation1 = Activation_ReLU()
@@ -82,12 +81,3 @@ activation3.forward(dense3.output)
 mse = loss_function.calculate(y_test, activation3.output)
 
 print(f'Neural network: {mse}, ')
-
-
-poly = PolynomialFeatures(degree=2)
-X_ = poly.fit_transform(x)
-predict_ = poly.fit_transform(y)
-
-clf = linear_model.LinearRegression()
-clf.fit(X_, vector)
-print clf.predict(predict_)

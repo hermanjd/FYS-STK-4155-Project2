@@ -192,7 +192,6 @@ class Optimizer_SGD:
 
     # Update parameters
     def update_params(self, layer):
-
         # If we use momentum
         if self.momentum:
 
@@ -220,11 +219,8 @@ class Optimizer_SGD:
 
         # Vanilla SGD updates (as before momentum update)
         else:
-            weight_updates = -self.current_learning_rate * \
-                             layer.dweights
-            bias_updates = -self.current_learning_rate * \
-                           layer.dbiases
-
+            weight_updates = -self.current_learning_rate * layer.dweights
+            bias_updates = -self.current_learning_rate * layer.dbiases
         # Update weights and biases using either
         # vanilla or momentum updates
         layer.weights += weight_updates
@@ -625,3 +621,8 @@ class Loss_MeanAbsoluteError(Loss):  # L1 loss
         self.dinputs = np.sign(y_true - dvalues) / outputs
         # Normalize gradient
         self.dinputs = self.dinputs / samples
+
+
+
+
+# Self made, do not delete!!! .---------------------------
