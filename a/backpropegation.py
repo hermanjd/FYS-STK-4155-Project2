@@ -9,7 +9,9 @@ nnfs.init()
 class Layer_Dense:
 
     # Layer initialization
-    def __init__(self, n_inputs, n_neurons, weight_regularizer_l1=0, weight_regularizer_l2=0, bias_regularizer_l1=0, bias_regularizer_l2=0):
+    def __init__(self, n_inputs, n_neurons,
+                 weight_regularizer_l1=0, weight_regularizer_l2=0,
+                 bias_regularizer_l1=0, bias_regularizer_l2=0):
         # Initialize weights and biases
         self.weights = 0.1 * np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
@@ -113,7 +115,8 @@ class Activation_LeakyReLU:
     # Backward pass
     def backward(self, dvalues):
         self.dinputs = dvalues.copy()
-        self.dinputs[self.inputs <= 0] = self.alpha
+        dx = np.ones_like(self.dinputs)
+        dx[self.dinputs < 0] = self.alpha
 
 # Softmax activation
 class Activation_Softmax:
@@ -186,9 +189,6 @@ class Activation_Linear:
 
 # SGD optimizer
 class Optimizer_SGD:
-
-    # Initialize optimizer - set settings,
-    # learning rate of 1. is default for this optimizer
     def __init__(self, learning_rate=1., decay=0., momentum=0.):
         self.learning_rate = learning_rate
         self.current_learning_rate = learning_rate
@@ -196,22 +196,35 @@ class Optimizer_SGD:
         self.iterations = 0
         self.momentum = momentum
 
-    # Call once before any parameter updates
     def pre_update_params(self):
         if self.decay:
-            self.current_learning_rate = self.learning_rate * (1. / (1. + self.decay * self.iterations))
+            self.current_learning_rate = self.learning_rate * \
+                (1. / (1. + self.decay * self.iterations))
 
-    # Update parameters
     def update_params(self, layer):
+        # If we use momentum
         if self.momentum:
+
+            # If layer does not contain momentum arrays, create them
+            # filled with zeros
             if not hasattr(layer, 'weight_momentums'):
                 layer.weight_momentums = np.zeros_like(layer.weights)
+                # If there is no momentum array for weights
+                # The array doesn't exist for biases yet either.
                 layer.bias_momentums = np.zeros_like(layer.biases)
-            weight_updates = self.momentum * layer.weight_momentums - self.current_learning_rate * layer.dweights
+
+            # Build weight updates with momentum - take previous
+            # updates multiplied by retain factor and update with
+            # current gradients
+            weight_updates = \
+                self.momentum * layer.weight_momentums - \
+                self.current_learning_rate * layer.dweights
             layer.weight_momentums = weight_updates
 
             # Build bias updates
-            bias_updates = self.momentum * layer.bias_momentums - self.current_learning_rate * layer.dbiases
+            bias_updates = \
+                self.momentum * layer.bias_momentums - \
+                self.current_learning_rate * layer.dbiases
             layer.bias_momentums = bias_updates
 
         # Vanilla SGD updates (as before momentum update)
@@ -241,7 +254,8 @@ class Optimizer_Adagrad:
     # Call once before any parameter updates
     def pre_update_params(self):
         if self.decay:
-            self.current_learning_rate = self.learning_rate * (1. / (1. + self.decay * self.iterations))
+            self.current_learning_rate = self.learning_rate * \
+                (1. / (1. + self.decay * self.iterations))
 
     # Update parameters
     def update_params(self, layer):
@@ -258,8 +272,12 @@ class Optimizer_Adagrad:
 
         # Vanilla SGD parameter update + normalization
         # with square rooted cache
-        layer.weights += -self.current_learning_rate * layer.dweights / (np.sqrt(layer.weight_cache) + self.epsilon)
-        layer.biases += -self.current_learning_rate * layer.dbiases / (np.sqrt(layer.bias_cache) + self.epsilon)
+        layer.weights += -self.current_learning_rate * \
+                         layer.dweights / \
+                         (np.sqrt(layer.weight_cache) + self.epsilon)
+        layer.biases += -self.current_learning_rate * \
+                        layer.dbiases / \
+                        (np.sqrt(layer.bias_cache) + self.epsilon)
 
     # Call once after any parameter updates
     def post_update_params(self):
@@ -269,7 +287,8 @@ class Optimizer_Adagrad:
 class Optimizer_RMSprop:
 
     # Initialize optimizer - set settings
-    def __init__(self, learning_rate=0.001, decay=0., epsilon=1e-7, rho=0.9):
+    def __init__(self, learning_rate=0.001, decay=0., epsilon=1e-7,
+                 rho=0.9):
         self.learning_rate = learning_rate
         self.current_learning_rate = learning_rate
         self.decay = decay

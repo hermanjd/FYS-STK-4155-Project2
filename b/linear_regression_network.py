@@ -1,33 +1,37 @@
+import sys
+sys.path.append("..")
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
 from backpropegation import *
 import matplotlib.pyplot as plt
-import StatFunctions
 
-datapoints = 100
+datapoints = 1000
+learning_rate = 0.001
+momentum=0.9
 
 def f(x):
     return 4.2 + 3.2*x - 0.6*x**2
 
-x = (np.random.rand(datapoints)*10).reshape(-1, 1)
+x = ((np.random.rand(datapoints)*15)-5).reshape(-1, 1)
 y = (f(x)).reshape(-1, 1)
 
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
-dense1 = Layer_Dense(1, 64)
-activation1 = Activation_ReLU()
-dense2 = Layer_Dense(64, 64)
-activation2 = Activation_ReLU()
-dense3 = Layer_Dense(64, 1)
+dense1 = Layer_Dense(1, 16)
+activation1 = Activation_Sigmoid()
+dense2 = Layer_Dense(16, 16)
+activation2 = Activation_Sigmoid()
+dense3 = Layer_Dense(16, 1)
 activation3 = Activation_Linear()
 loss_function = Loss_MeanSquaredError()
-optimizer = Optimizer_Adam(learning_rate=0.005, decay=1e-3)
-accuracy_precision = np.std(y_train) / 250
+optimizer = Optimizer_SGD(learning_rate=learning_rate, momentum=momentum)
 
-for epoch in range(10001):
+loss_list = []
+true_loss = []
 
-    # Perform a forward pass of our training data through this layer
+
+for epoch in range(20000):
     dense1.forward(X_train)
     activation1.forward(dense1.output)
     dense2.forward(activation1.output)
@@ -35,7 +39,6 @@ for epoch in range(10001):
     dense3.forward(activation2.output)
     activation3.forward(dense3.output)
     data_loss = loss_function.calculate(activation3.output, y_train)
-
     regularization_loss = \
         loss_function.regularization_loss(dense1) + \
         loss_function.regularization_loss(dense2) + \
@@ -43,11 +46,9 @@ for epoch in range(10001):
 
     loss = data_loss + regularization_loss
     predictions = activation3.output
-    accuracy = np.mean(np.absolute(predictions - y_train) < accuracy_precision)
-
+    loss_list.append(data_loss)
     if not epoch % 100:
         print(f'epoch: {epoch}, ' +
-              f'acc: {accuracy:.3f}, ' +
               f'loss: {loss:.3f} (' +
               f'data_loss: {data_loss:.3f}, ' +
               f'reg_loss: {regularization_loss:.3f}), ' +
@@ -78,6 +79,9 @@ activation2.forward(dense2.output)
 dense3.forward(activation2.output)
 activation3.forward(dense3.output)
 
-mse = loss_function.calculate(y_test, activation3.output)
+mse = loss_function.calculate(activation3.output, y_test)
 
 print(f'Neural network: {mse}, ')
+
+plt.plot(loss_list)
+plt.show()
