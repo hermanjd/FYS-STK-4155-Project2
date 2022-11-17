@@ -20,7 +20,7 @@ def FrankeFunctionWithNoise(x,y,noise):
 N = 1000
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
-z = (FrankeFunction(x,y)).reshape(-1, 1) #adding some noise to the data
+z = (FrankeFunction(x,y)).reshape(-1, 1)
 XY = np.vstack((x, y)).T
 learning_rate = 0.01
 momentum=0.5
