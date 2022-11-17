@@ -11,20 +11,20 @@ learning_rate = 0.005
 data = np.loadtxt(".././formatted_wdbc.data",delimiter=',')
 X = data[:,2:]
 y = data[:, 1].astype(int)
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+new_matrix = X / X.max(axis=0)
+X_train, X_test, y_train, y_test = train_test_split(new_matrix, y, test_size=0.2, random_state=42)
 
 y_train = y_train.reshape(-1, 1)
 
-dense1 = Layer_Dense(X.shape[1], 16)
+dense1 = Layer_Dense(X.shape[1], 32)
 activation1 = Activation_ReLU()
-dense2 = Layer_Dense(16, 1)
+dense2 = Layer_Dense(32, 1)
 activation2 = Activation_Sigmoid()
 loss_function = Loss_BinaryCrossentropy()
 optimizer = Optimizer_Adam(learning_rate=learning_rate, decay=5e-5)
 
 batch_size = 32
-epochs = 10
+epochs = 70
 
 loss_list = []
 
@@ -78,7 +78,7 @@ loss = loss_function.calculate(activation2.output, y_test)
 
 MSE = np.square(np.subtract(y_test,activation2.output)).mean()
 predictions = (activation2.output > 0.5) * 1
-accuracy = np.mean(predictions==y_test)
+accuracy = np.mean(activation2.output.round()==y_test)
 
 print(f'validation, acc: {accuracy:.3f}, loss: {loss:.3f}, MSE: {MSE:.3f}')
 

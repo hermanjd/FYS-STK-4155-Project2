@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 n = 100
 
 def f(x):
-    return 4.2 + 3.2*x + (0.6*x**2)
+    return 4.2 + 3.2*x
 
 x = np.random.rand(n)*10
 y = f(x)
