@@ -11,17 +11,8 @@ learning_rate = 0.05
 data = np.loadtxt(".././formatted_wdbc.data",delimiter=',')
 X = data[:,2:]
 y = data[:, 1].astype(np.float64)
-print("min")
-print(X.min())
-print("max")
-print(X.max())
+
 new_matrix = X / X.max(axis=0)
-
-print("min")
-print(new_matrix.min())
-print("max")
-print(new_matrix.max())
-
 
 X_train, X_test, y_train, y_test = train_test_split(new_matrix, y, test_size=0.2, random_state=42)
 
@@ -57,23 +48,10 @@ for epoch in range(epochs):
                     f'loss: {loss:.3f}, ' +
                     f'lr: {optimizer.current_learning_rate}')
 
-        # Backward pass
-        #print("Ybatch one output:")
-        #print(y_batch)
-        #print("dense one output:")
-        #print(dense1.output)
-        #print("activation one output:")
-        #print(activation1.output)
         loss_function.backward(activation1.output, y_batch)
-        #print("loss_function one doutput:")
-        #print(loss_function.dinputs)
         activation1.backward(loss_function.dinputs)
-        #print("activation1 one doutput:")
-        #print(activation1.dinputs)
         dense1.backward(activation1.dinputs)
-        #print("dense one doutput:")
-        #print(dense1.dinputs)
-        # Update weights and biases
+
         optimizer.pre_update_params()
         optimizer.update_params(dense1)
         optimizer.post_update_params()
