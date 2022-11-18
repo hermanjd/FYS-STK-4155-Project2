@@ -5,7 +5,7 @@ from backpropegation import *
 import gzip
 import matplotlib.pyplot as plt
 
-num_images = 55000
+num_images = 60000
 image_size = 28
 neurons = 256
 batch_size = 32
@@ -44,7 +44,6 @@ dense3 = Layer_Dense(neurons, 10)
 loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
 optimizer = Optimizer_SGD(decay=decay, learning_rate=learning_rate, momentum=momentum)
 
-
 for epoch in range(epochs):
     print(epoch)
     for batch in range(int(len(X_train)/batch_size)):
@@ -68,23 +67,11 @@ for epoch in range(epochs):
         # Calculate overall loss
         loss = data_loss + regularization_loss
         # Backward pass
-        #print("loss_activation.output")
-        #print(loss_activation.output)
         loss_activation.backward(loss_activation.output, y_batch)
-        #print("loss_activation.dinputs")
-        #print(loss_activation.dinputs)
         dense3.backward(loss_activation.dinputs)
-        #print("dense3.dinputs")
-        #print(dense3.dinputs)
         activation2.backward(dense3.dinputs)
-        #print("activation2.dinputs")
-        #print(activation2.dinputs)
         dense2.backward(activation2.dinputs)
-        #print("dense2.dinputs")
-        #print(dense2.dinputs)
         activation1.backward(dense2.dinputs)
-        #print("dense3.dinputs")
-        #print(activation1.dinputs)
         dense1.backward(activation1.dinputs)
         # Update weights and biases
         optimizer.pre_update_params()
