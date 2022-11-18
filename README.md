@@ -9,7 +9,7 @@ Important notice is that the ordinary least square fit is not included in this r
 
 The folder "trowAwayAttempts" is a collections of other experiments I've run, but is not part of the paper.
 
-Feel free to contact me if the code is not running or you need help understanding the repo.
+Feel free to contact me if the code is not running as expected or you need help understanding the repo.
 
 ## Acknowledgements 
 I want to give a big thanks to Harrison Kinsley & Daniel Kukieła for making it intuiative to understand and implement the methods used in this project. A lot of code examples from their book "Neural Networks from Scratch in Python" was used in this project and because of this I've decided to credit them. I've also added the MIT licence in the NeuralNetFunctions.py file.
