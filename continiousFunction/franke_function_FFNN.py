@@ -3,11 +3,8 @@ sys.path.append("..")
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
-from backpropegation import *
+from NeuralNetFunctions import *
 import matplotlib.pyplot as plt
-
-learning_rate = 0.01
-momentum=0.9
 
 def FrankeFunction(x,y):
 	term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
@@ -16,16 +13,22 @@ def FrankeFunction(x,y):
 	term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
 	return term1 + term2 + term3 + term4
 
+def FrankeFunctionWithNoise(x,y,noise):
+    frank = FrankeFunction(x,y)
+    return frank + np.random.normal(0, noise, frank.shape)
+
 N = 1000
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
 z = (FrankeFunction(x,y)).reshape(-1, 1)
 XY = np.vstack((x, y)).T
+learning_rate = 0.01
+momentum=0.5
 
 XY_train, XY_test, z_train, z_test = train_test_split(XY,z,test_size=0.2)
 
 dense1 = Layer_Dense(2, 750)
-activation1 = Activation_LeakyReLU(alpha=0.01)
+activation1 = Activation_Sigmoid()
 dense2 = Layer_Dense(750, 1)
 activation2 = Activation_Linear()
 loss_function = Loss_MeanSquaredError()
@@ -34,7 +37,7 @@ optimizer = Optimizer_SGD(learning_rate=learning_rate, momentum=momentum)
 loss_list = []
 
 batch_size = 32
-epochs = 10
+epochs = 100
 for epoch in range(epochs):
     print(epoch)
     for batch in range(int(len(XY_train)/batch_size)):
@@ -72,3 +75,15 @@ print(f'Neural network: {mse}, ')
 
 plt.plot(loss_list)
 plt.show()
+
+
+"""
+With some tuning and tweaking i was able to get the neural network down to 0.024814279699272492 wich I am quite happy with. I've optet for a large amount of neurons in order for the network to fully capture the curvature of the function.
+
+The ordinary least squares functions used in project 1 was able to get a mean squared error of just 0.00212 wich is still a lot better then the neural network.
+
+Thaughts about using neural network for linear regressin:
+
+I believe in the case of trying to fit a continious function that it may be smarter to use regression methods rather then neural networks. The result seems to be more precise
+
+"""

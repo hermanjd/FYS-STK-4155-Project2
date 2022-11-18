@@ -1,7 +1,9 @@
+import sys
+sys.path.append("..")
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from backpropegation import *
+from NeuralNetFunctions import *
 import gzip
 import matplotlib.pyplot as plt
 
