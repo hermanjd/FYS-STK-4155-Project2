@@ -5,11 +5,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from NeuralNetFunctions import *
 import gzip
-import matplotlib.pyplot as plt
 
 num_images = 60000
 image_size = 28
-neurons = 256
 batch_size = 32
 epochs = 3
 decay=5e-7
@@ -52,6 +50,7 @@ for epoch in range(epochs):
         # Backward pass
         loss_activation.backward(loss_activation.output, y_batch)
         dense1.backward(loss_activation.dinputs)
+
         # Update weights and biases
         optimizer.pre_update_params()
         optimizer.update_params(dense1)
@@ -65,5 +64,3 @@ predictions = np.argmax(loss_activation.output, axis=1)
 y_test_argmax = np.argmax(y_test, axis=1)
 accuracy = np.mean(predictions==y_test_argmax)
 print(accuracy)
-
-# Managed to get an accuracy of 0.9162 after 500 generations

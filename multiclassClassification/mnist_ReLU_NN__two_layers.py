@@ -1,7 +1,6 @@
 import sys
 sys.path.append("..")
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from NeuralNetFunctions import *
 import gzip
@@ -102,18 +101,3 @@ plt.title(txt)
 plt.plot(accuracy_train)
 plt.plot(accuracy_test)
 plt.show()
-
-#Might be good to check training and testing accuracy to see if the model is overfit
-
-# Test results 80 Epoch, Optimizer_Adam(decay=5e-7, learning_rate=0.01)
-# Training data: 0.97625 - Test Data: 0.9608
-
-# Test results 100 Epoch, Optimizer_Adam(decay=5e-7, learning_rate=0.01)
-# Training data: 0.9895 - Test Data: 0.9681
-
-# Test results 500 Epoch, Optimizer_Adam(decay=5e-7, learning_rate=0.008)
-# Training data: 0.9974 - Test Data:0.9715
-
-# Note, while the test data accuracy seems to be going up with more epoch, we can very clearly see that the model is also overfitting to the training data due to the 
-# high fit of the training set at 99.74% and the testing accuracy at 97.15%. This gives ut a 2.59% differance between training and test accuracy.
-

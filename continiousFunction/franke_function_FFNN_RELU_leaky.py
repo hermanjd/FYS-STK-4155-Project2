@@ -1,8 +1,6 @@
 import sys
 sys.path.append("..")
-from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures
 from NeuralNetFunctions import *
 import matplotlib.pyplot as plt
 
