@@ -1,6 +1,6 @@
 # FYS-STK-4155-Project2
 
-Here lies the code developed to compare feed forward neural networks to Ordinary least squares and linear regression. It's written in python 3 and you will need sklearn and numpy to run it.
+Here lies the code developed to compare feed forward neural networks to Ordinary least squares and logistic regression. It's written in python 3 and you will need sklearn and numpy to run it.
 
 ## Structure
 Each experiment lies in its own folder labeld after the experiment named continiousFunction, binaryClassification and multiclassClassification. The data folder contains datafiles used by the programs.
