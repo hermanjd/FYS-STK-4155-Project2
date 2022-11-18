@@ -6,13 +6,8 @@ from sklearn.preprocessing import PolynomialFeatures
 from backpropegation import *
 import matplotlib.pyplot as plt
 
-datapoints = 100
 learning_rate = 0.01
 momentum=0.9
-
-def f(x):
-    return 4.2 + 3.2*x - 0.6*x**2
-
 
 def FrankeFunction(x,y):
 	term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
@@ -21,14 +16,10 @@ def FrankeFunction(x,y):
 	term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
 	return term1 + term2 + term3 + term4
 
-def FrankeFunctionWithNoise(x,y,noise):
-    frank = FrankeFunction(x,y)
-    return frank + np.random.normal(0, noise, frank.shape)
-
 N = 1000
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
-z = (FrankeFunction(x,y)).reshape(-1, 1) #adding some noise to the data
+z = (FrankeFunction(x,y)).reshape(-1, 1)
 XY = np.vstack((x, y)).T
 
 XY_train, XY_test, z_train, z_test = train_test_split(XY,z,test_size=0.2)
